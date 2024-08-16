@@ -1,0 +1,38 @@
+name: Merge Branches and Create New Branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch1:
+        description: 'First branch to merge'
+        required: true
+        default: 'main'
+      branch2:
+        description: 'Second branch to merge'
+        required: true
+        default: 'feature-branch'
+
+jobs:
+  merge-and-create:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Generate new branch name
+      id: generate_branch_name
+      run: echo "new_branch=$(date +'%Y%m%d-%H%M%S-merged-branch')" >> $GITHUB_ENV
+
+    - name: Create and merge branches
+      run: |
+        git config user.name "github-actions"
+        git config user.email "actions@github.com"
+        git checkout -b ${{ env.new_branch }} ${{ github.event.inputs.branch1 }}
+        git merge ${{ github.event.inputs.branch2 }} --no-ff -m "Merge ${{ github.event.inputs.branch2 }} into ${{ env.new_branch }}"
+        git push origin ${{ env.new_branch }}
+
+    - name: Notify Slack
+      if: success()
+      run: |
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"New branch `${{ env.new_branch }}` created successfully by merging `${{ github.event.inputs.branch1 }}` and `${{ github.event.inputs.branch2 }}`."}' $SLACK_WEBHOOK_URL
