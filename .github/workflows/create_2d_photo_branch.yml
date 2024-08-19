@@ -41,10 +41,10 @@ jobs:
         git checkout ${{ github.event.inputs.branch2 }}
         git pull
         git checkout -b ${{ env.new_branch }} ${{ github.event.inputs.branch1 }}
-        git merge ${{ github.event.inputs.branch2 }} --no-ff -m "Merge ${{ github.event.inputs.branch2 }} into ${{ env.new_branch }}"
+        git merge ${{ github.event.inputs.branch2 }} --no-ff -m "Merge ${{ github.event.inputs.branch2 }} into ${{ env.new_branch }}" || true
         git push origin ${{ env.new_branch }}
 
-    - name: Notify Slack
-      if: success()
-      run: |
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"New branch `${{ env.new_branch }}` created successfully by merging `${{ github.event.inputs.branch1 }}` and `${{ github.event.inputs.branch2 }}`."}' $SLACK_WEBHOOK_URL
+    #- name: Notify Slack
+     # if: success()
+     # run: |
+       # curl -X POST -H 'Content-type: application/json' --data '{"text":"New branch `${{ env.new_branch }}` created successfully by merging `${{ github.event.inputs.branch1 }}` and `${{ github.event.inputs.branch2 }}`."}' $SLACK_WEBHOOK_URL
