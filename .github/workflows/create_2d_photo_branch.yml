@@ -17,8 +17,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
     - name: Checkout repository
       uses: actions/checkout@v3
+
+    - name: Fetch
+      run: git fetch origin
 
     - name: Pull latest changes
       run: git checkout ${{ github.event.inputs.branch1 }} && git pull origin ${{ github.event.inputs.branch1 }}
