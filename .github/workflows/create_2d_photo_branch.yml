@@ -31,13 +31,15 @@ jobs:
       id: generate_branch_name
       run: echo "new_branch=$(date +'%Y%m%d-%H%M%S-merged-branch')" >> $GITHUB_ENV
 
-    - name: Shaw branchs
-      run: git branch
-
     - name: Create and merge branches
       run: |
         git config user.name "github-actions"
         git config user.email "actions@github.com"
+        git checkout 
+        git checkout ${{ github.event.inputs.branch1 }}
+        git pull
+        git checkout ${{ github.event.inputs.branch2 }}
+        git pull
         git checkout -b ${{ env.new_branch }} ${{ github.event.inputs.branch1 }}
         git merge ${{ github.event.inputs.branch2 }} --no-ff -m "Merge ${{ github.event.inputs.branch2 }} into ${{ env.new_branch }}"
         git push origin ${{ env.new_branch }}
