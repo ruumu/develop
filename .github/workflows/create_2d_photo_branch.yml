@@ -6,11 +6,15 @@ on:
       branch1:
         description: 'First branch to merge'
         required: true
-        default: 'main'
+        default: 'specific-avatar-branch'
       branch2:
         description: 'Second branch to merge'
         required: true
-        default: 'feature-branch'
+        default: 'specific-room-branch'
+      new_branch:
+        description: 'new branch name'
+        required: true
+        default: 'hoge'
 
 jobs:
   merge-and-create:
@@ -27,10 +31,9 @@ jobs:
     - name: Pull latest changes
       run: git checkout ${{ github.event.inputs.branch1 }} && git pull origin ${{ github.event.inputs.branch1 }}
 
-    - name: Generate new branch name
-      id: generate_branch_name
-      run: echo "new_branch=$(date +'%Y%m%d-%H%M%S-merged-branch')" >> $GITHUB_ENV
-
+    - name: Append _hoge to new_branch
+      run: echo "new_branch_with_suffix=${{ github.event.inputs.new_branch }}-2d-photo-branch" >> $GITHUB_ENV
+    
     - name: Create and merge branches
       run: |
         git config user.name "github-actions"
@@ -40,9 +43,9 @@ jobs:
         git pull
         git checkout ${{ github.event.inputs.branch2 }}
         git pull
-        git checkout -b ${{ env.new_branch }} ${{ github.event.inputs.branch1 }}
-        git merge ${{ github.event.inputs.branch2 }} --no-ff -m "Merge ${{ github.event.inputs.branch2 }} into ${{ env.new_branch }}" || true
-        git push origin ${{ env.new_branch }}
+        git checkout -b ${{ env.new_branch_with_suffix }} ${{ github.event.inputs.branch1 }}
+        git merge ${{ github.event.inputs.branch2 }} --no-ff -m "Merge ${{ github.event.inputs.branch2 }} into ${{ env.new_branch_with_suffix }}" || true
+        git push origin ${{ env.new_branch_with_suffix }}
 
     #- name: Notify Slack
      # if: success()
