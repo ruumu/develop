@@ -20,6 +20,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Pull latest changes
+      run: git pull origin ${{ github.event.inputs.branch1 }}
+
     - name: Generate new branch name
       id: generate_branch_name
       run: echo "new_branch=$(date +'%Y%m%d-%H%M%S-merged-branch')" >> $GITHUB_ENV
